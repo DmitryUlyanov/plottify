@@ -27,12 +27,15 @@ __all__ = ["show_img", "draw_outline", "draw_rect", "draw_text", "plot_grid",
 ##############################
 def show_img(im, ax=None, figsize=None, show_axs=False):
     ''' Plots an image on ax object. If no ax object was passed, it creates an ax object
-    :param im: (np.array) RGM image in np.array format
+    :param im: (np.array) RGB image in np.array format or path to image
     :param ax: (matplotlib.axes._subplots.AxesSubplot)
     :param figsize: tuple(int) if ax is not None it will specify figure size
     :param show_axs: (bool) show or not pixel coordinates on plot
     :return: (matplotlib.axes._subplots.AxesSubplot) object
     '''
+    if isinstance(im, str):
+        im = plt.imread(im)
+        
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
     ax.imshow(im)
@@ -40,7 +43,6 @@ def show_img(im, ax=None, figsize=None, show_axs=False):
     ax.get_xaxis().set_visible(show_axs)
     ax.get_yaxis().set_visible(show_axs)
     return ax
-
 
 def draw_outline(o, lw, c='black'):
     '''
@@ -112,13 +114,15 @@ def plot_grid(objects, plot_func, ncols=4, fig_width=18):
     :return:
     '''
     nrows = len(objects) // ncols + bool(len(objects) % ncols)
-    fig, ax = plt.subplots(nrows, ncols, figsize=(fig_width, nrows*5))
+    ncols = min(ncols, len(objects))
+    fig, ax = plt.subplots(nrows, ncols, figsize=(fig_width, nrows * 5))
+    
     # dummy workaround in the case of one-row grid
     if len(objects) <= ncols:
         ax = [ax]
-
+        
     for i in range(nrows):
-        slc = objects[i*ncols: i*ncols+ncols]
+        slc = objects[i * ncols: i * ncols + ncols]
         plot_row(ax[i], slc, plot_func)
     plt.tight_layout()
     plt.show()
